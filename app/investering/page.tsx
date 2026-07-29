@@ -1,12 +1,13 @@
 export default function InvesteringPage() {
   return (
-    <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-10 sm:px-6">
-      <h1 className="text-3xl font-semibold tracking-tight text-zinc-900">
+    <main className="flex-1 py-10">
+      <h1 className="text-3xl font-semibold tracking-tight text-white">
         Investering
       </h1>
-      <p className="mt-4 max-w-2xl text-lg leading-8 text-zinc-600">
-        Her finder du råd og viden om investering. Indholdet er under opbygning –
-        snart kan du læse mere om aktier, fonde og langsigtet opsparing.
+      <p className="mt-4 max-w-2xl text-lg leading-8 text-white">
+        Her finder du råd og værktøjer til investering. Brug{" "}
+        <span className="font-medium text-white">Aktie kontotyper</span> til at
+        finde den rigtige kontotype til dig – trin for trin.
       </p>
     </main>
   );
