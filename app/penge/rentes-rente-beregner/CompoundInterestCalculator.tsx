@@ -42,6 +42,32 @@ function CurrencyInput({
     if (!focused) setText(formatNumberDa(value));
   }, [value, focused]);
 
+  function formatTypedAmount(
+    raw: string,
+    cursor: number | null,
+  ): { formatted: string; parsed: number | null; nextCursor: number } {
+    const digitsBeforeCursor = raw
+      .slice(0, cursor ?? raw.length)
+      .replace(/\D/g, "").length;
+    const digits = raw.replace(/\D/g, "");
+
+    if (digits === "") {
+      return { formatted: "", parsed: null, nextCursor: 0 };
+    }
+
+    const parsed = Number(digits);
+    const formatted = formatNumberDa(parsed);
+
+    let nextCursor = 0;
+    let seen = 0;
+    while (nextCursor < formatted.length && seen < digitsBeforeCursor) {
+      if (/\d/.test(formatted[nextCursor] ?? "")) seen += 1;
+      nextCursor += 1;
+    }
+
+    return { formatted, parsed, nextCursor };
+  }
+
   function commit(raw: string) {
     const parsed = parseDaNumber(raw);
     if (parsed === null || parsed < 0) {
@@ -59,10 +85,21 @@ function CurrencyInput({
       </label>
       <input
         id={id}
-        inputMode="decimal"
+        inputMode="numeric"
         value={text}
         onFocus={() => setFocused(true)}
-        onChange={(event) => setText(event.target.value)}
+        onChange={(event) => {
+          const input = event.target;
+          const { formatted, parsed, nextCursor } = formatTypedAmount(
+            input.value,
+            input.selectionStart,
+          );
+          setText(formatted);
+          if (parsed !== null) onChange(parsed);
+          requestAnimationFrame(() => {
+            input.setSelectionRange(nextCursor, nextCursor);
+          });
+        }}
         onBlur={() => {
           setFocused(false);
           commit(text);
@@ -295,7 +332,7 @@ export default function CompoundInterestCalculator() {
             label="Årligt afkast"
             value={annualReturn}
             min={0}
-            max={20}
+            max={50}
             step={0.1}
             unit="%"
             fractionDigits={1}
