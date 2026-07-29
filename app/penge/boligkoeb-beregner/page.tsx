@@ -14,8 +14,15 @@ export default function BoligkoebBeregnerPage() {
         <h1 className="text-3xl font-semibold tracking-tight text-white">
           Nyt lån til boligkøb
         </h1>
-        <p className="mt-2 max-w-2xl text-white">
-          Se, hvad det koster at låne til ny bolig.
+        <p className="mt-2 max-w-3xl leading-7 text-white">
+          Se hvor meget du kan købe nyt hus og lav beregning eller lav beregning
+          på Boliglån.
+          <br />
+          <br />
+          Du kan låne op til 80% af din ejerboligs værdi som realkreditlån (75%
+          ved fritidshus). Resten skal finansieres med egen opsparing (min. 5%
+          af boligens pris + omkostninger til boligkøbet) og evt. lån i dit
+          pengeinstitut.
         </p>
       </div>
 
