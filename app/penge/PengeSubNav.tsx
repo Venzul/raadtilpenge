@@ -10,6 +10,16 @@ const subtabs = [
     label: "Rentes rente beregner",
     exact: false,
   },
+  {
+    href: "/penge/fire-beregner",
+    label: "FIRE Beregner",
+    exact: false,
+  },
+  {
+    href: "/penge/boligkoeb-beregner",
+    label: "Boligkøb beregner",
+    exact: false,
+  },
 ] as const;
 
 export default function PengeSubNav() {
