@@ -7,7 +7,9 @@ export default function InvesteringPage() {
       <p className="mt-4 max-w-2xl text-lg leading-8 text-white">
         Her finder du råd og værktøjer til investering. Brug{" "}
         <span className="font-medium text-white">Aktie kontotyper</span> til at
-        finde den rigtige kontotype til dig – trin for trin.
+        finde den rigtige kontotype – og{" "}
+        <span className="font-medium text-white">Indeks oversigt</span> til at
+        forstå, hvad globale aktieindekser egentlig dækker.
       </p>
     </main>
   );

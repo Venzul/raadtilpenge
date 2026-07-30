@@ -10,6 +10,11 @@ const subtabs = [
     label: "Aktie kontotyper",
     exact: false,
   },
+  {
+    href: "/investering/index-overview",
+    label: "Indeks oversigt",
+    exact: false,
+  },
 ] as const;
 
 export default function InvesteringSubNav() {
