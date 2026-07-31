@@ -11,7 +11,9 @@ export default function PengePage() {
         <span className="font-medium text-white">FIRE Beregner</span> til at
         estimere, hvornår du kan blive økonomisk uafhængig, eller{" "}
         <span className="font-medium text-white">Boligkøb beregner</span> til at
-        se, hvad det koster at låne til ny bolig.
+        se, hvad det koster at låne til ny bolig, eller{" "}
+        <span className="font-medium text-white">Bil beregner</span> til at finde
+        ud af, hvad du realistisk kan købe bil for.
       </p>
     </main>
   );

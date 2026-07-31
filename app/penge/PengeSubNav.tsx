@@ -20,6 +20,11 @@ const subtabs = [
     label: "Boligkøb beregner",
     exact: false,
   },
+  {
+    href: "/penge/bil-beregner",
+    label: "Bil beregner",
+    exact: false,
+  },
 ] as const;
 
 export default function PengeSubNav() {
