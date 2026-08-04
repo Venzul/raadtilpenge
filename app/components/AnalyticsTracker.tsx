@@ -25,7 +25,7 @@ export default function AnalyticsTracker() {
 
     if (pathname.includes("beregner")) {
       track("calculator_viewed", {
-        calculator: pathname.split("/").pop() ?? pathname,
+        calculator: pathname.split("/").filter(Boolean).at(-1) ?? pathname,
       });
     }
   }, [pathname]);

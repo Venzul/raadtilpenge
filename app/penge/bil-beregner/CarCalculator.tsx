@@ -14,6 +14,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { useCalculatorAnalytics } from "../../lib/useCalculatorAnalytics";
 import {
   calculateCarAffordability,
   formatDkk,
@@ -282,6 +283,30 @@ export default function CarCalculator() {
     monthlyInsurance,
     monthlyMaintenance,
     monthlyGreenTax,
+  });
+
+  useCalculatorAnalytics({
+    section: "penge",
+    tabKey: "bil-beregner",
+    calculator: "bil-beregner",
+    inputs: {
+      monthlyNetIncome,
+      affordabilityPercent,
+      downPayment,
+      tradeInValue,
+      loanTermMonths,
+      interestRate,
+      monthlyFuel,
+      monthlyInsurance,
+      monthlyMaintenance,
+      monthlyGreenTax,
+    },
+    outputs: {
+      maxVehiclePrice: result.maxVehiclePrice,
+      maxLoanAmount: result.maxLoanAmount,
+      totalMonthlyCost: result.totalMonthlyCost,
+      maxMonthlyBudget: result.maxMonthlyBudget,
+    },
   });
 
   const chartData = result.depreciation.map((row) => ({

@@ -1,57 +1,16 @@
+import { resolveTabFromPath } from "./analytics-tabs";
+import { getVisitorId } from "./visitor";
+
 export type AnalyticsEvent = {
+  id?: number;
   name: string;
   path: string;
+  section?: string | null;
+  tabKey?: string | null;
   props?: Record<string, string>;
   at: string;
+  visitorId?: string;
 };
-
-const STORAGE_KEY = "rtp_analytics_events";
-const MAX_EVENTS = 500;
-
-export const ANALYTICS_STORAGE_KEY = STORAGE_KEY;
-
-function readEvents(): AnalyticsEvent[] {
-  if (typeof window === "undefined") return [];
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return [];
-    const parsed = JSON.parse(raw) as AnalyticsEvent[];
-    return Array.isArray(parsed) ? parsed : [];
-  } catch {
-    return [];
-  }
-}
-
-function writeEvents(events: AnalyticsEvent[]): void {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(events.slice(-MAX_EVENTS)));
-}
-
-export function track(
-  name: string,
-  props?: Record<string, string>,
-): void {
-  if (typeof window === "undefined") return;
-
-  const event: AnalyticsEvent = {
-    name,
-    path: window.location.pathname,
-    props,
-    at: new Date().toISOString(),
-  };
-
-  const events = readEvents();
-  events.push(event);
-  writeEvents(events);
-}
-
-export function getEvents(): AnalyticsEvent[] {
-  return readEvents();
-}
-
-export function clearEvents(): void {
-  if (typeof window === "undefined") return;
-  localStorage.removeItem(STORAGE_KEY);
-}
 
 export type DailyTraffic = {
   date: string;
@@ -62,83 +21,109 @@ export type DailyTraffic = {
 export type AnalyticsSummary = {
   totalEvents: number;
   pageViews: number;
+  uniqueUsers: number;
   trafficPerDay: DailyTraffic[];
   topPages: { path: string; count: number }[];
   topEvents: { name: string; count: number }[];
   recent: AnalyticsEvent[];
+  configured: boolean;
 };
 
-function toDateKey(date: Date): string {
-  const y = date.getFullYear();
-  const m = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  return `${y}-${m}-${day}`;
-}
+export type CalculatorRun = {
+  id: number;
+  section: string;
+  tabKey: string;
+  calculator: string;
+  visitorId: string;
+  inputs: Record<string, unknown>;
+  outputs: Record<string, unknown>;
+  createdAt: string;
+};
 
-function formatDayLabel(dateKey: string): string {
-  const [y, m, d] = dateKey.split("-").map(Number);
-  return new Date(y, m - 1, d).toLocaleDateString("da-DK", {
-    day: "numeric",
-    month: "short",
+export type TabAnalytics = {
+  tab: {
+    section: string;
+    tabKey: string;
+    label: string;
+    path: string;
+    hasInputs: boolean;
+  };
+  pageViews: number;
+  uniqueUsers: number;
+  totalEvents: number;
+  trafficPerDay: DailyTraffic[];
+  recentEvents: AnalyticsEvent[];
+  runs: CalculatorRun[];
+  configured: boolean;
+};
+
+export function track(
+  name: string,
+  props?: Record<string, string>,
+): void {
+  if (typeof window === "undefined") return;
+
+  const path = window.location.pathname;
+  const { section, tabKey } = resolveTabFromPath(path);
+
+  void fetch("/api/analytics/events", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      name,
+      path,
+      section,
+      tabKey,
+      visitorId: getVisitorId(),
+      props: props ?? {},
+    }),
+    keepalive: true,
+  }).catch(() => {
+    // Ignore network errors — analytics must not break the UI.
   });
 }
 
-function buildTrafficPerDay(
-  pageViews: AnalyticsEvent[],
-  days = 14,
-): DailyTraffic[] {
-  const counts = new Map<string, number>();
-  for (const event of pageViews) {
-    const key = toDateKey(new Date(event.at));
-    counts.set(key, (counts.get(key) ?? 0) + 1);
-  }
+export function trackCalculatorRun(input: {
+  section: string;
+  tabKey: string;
+  calculator: string;
+  inputs: Record<string, unknown>;
+  outputs?: Record<string, unknown>;
+}): void {
+  if (typeof window === "undefined") return;
 
-  const result: DailyTraffic[] = [];
-  const today = new Date();
-  today.setHours(12, 0, 0, 0);
-
-  for (let i = days - 1; i >= 0; i -= 1) {
-    const day = new Date(today);
-    day.setDate(today.getDate() - i);
-    const key = toDateKey(day);
-    result.push({
-      date: key,
-      label: formatDayLabel(key),
-      views: counts.get(key) ?? 0,
-    });
-  }
-
-  return result;
+  void fetch("/api/analytics/calculator-runs", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      ...input,
+      visitorId: getVisitorId(),
+      outputs: input.outputs ?? {},
+    }),
+    keepalive: true,
+  }).catch(() => {
+    // Ignore network errors — analytics must not break the UI.
+  });
 }
 
-export function getSummary(): AnalyticsSummary {
-  const events = readEvents();
-  const pageViews = events.filter((e) => e.name === "page_view");
-
-  const pageCounts = new Map<string, number>();
-  for (const event of pageViews) {
-    pageCounts.set(event.path, (pageCounts.get(event.path) ?? 0) + 1);
+export async function fetchSummary(): Promise<AnalyticsSummary> {
+  const res = await fetch("/api/analytics/summary", { cache: "no-store" });
+  if (!res.ok) {
+    throw new Error("Kunne ikke hente analytics");
   }
+  return res.json() as Promise<AnalyticsSummary>;
+}
 
-  const eventCounts = new Map<string, number>();
-  for (const event of events) {
-    eventCounts.set(event.name, (eventCounts.get(event.name) ?? 0) + 1);
+export async function fetchTabAnalytics(
+  section: string,
+  tabKey: string,
+): Promise<TabAnalytics> {
+  const res = await fetch(
+    `/api/analytics/tabs/${encodeURIComponent(section)}/${encodeURIComponent(tabKey)}`,
+    { cache: "no-store" },
+  );
+  if (!res.ok) {
+    throw new Error("Kunne ikke hente tab-analytics");
   }
-
-  const sortCount = (a: { count: number }, b: { count: number }) =>
-    b.count - a.count;
-
-  return {
-    totalEvents: events.length,
-    pageViews: pageViews.length,
-    trafficPerDay: buildTrafficPerDay(pageViews),
-    topPages: [...pageCounts.entries()]
-      .map(([path, count]) => ({ path, count }))
-      .sort(sortCount)
-      .slice(0, 10),
-    topEvents: [...eventCounts.entries()]
-      .map(([name, count]) => ({ name, count }))
-      .sort(sortCount),
-    recent: [...events].reverse().slice(0, 25),
-  };
+  return res.json() as Promise<TabAnalytics>;
 }

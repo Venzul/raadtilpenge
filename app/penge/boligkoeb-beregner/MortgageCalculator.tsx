@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useId, useState } from "react";
+import { useCalculatorAnalytics } from "../../lib/useCalculatorAnalytics";
 import {
   calculateMortgage,
   formatDkk,
@@ -338,6 +339,28 @@ export default function MortgageCalculator() {
   );
 
   const tableRows = getAmortizationRows(result.rows, tableMode);
+
+  useCalculatorAnalytics({
+    section: "penge",
+    tabKey: "boligkoeb-beregner",
+    calculator: "boligkoeb-beregner",
+    inputs: {
+      annualSalary,
+      debtFactor,
+      disposableIncome,
+      downPayment,
+      housePrice,
+      savings,
+      loanAmount,
+      years,
+      contributionRate,
+      interestRate,
+    },
+    outputs: {
+      monthlyPaymentBeforeTax: result.monthlyPaymentBeforeTax,
+      monthlyPaymentAfterTax: result.monthlyPaymentAfterTax,
+    },
+  });
 
   return (
     <div className="flex flex-col gap-10 text-white">

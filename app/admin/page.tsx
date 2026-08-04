@@ -1,23 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import {
-  Area,
-  AreaChart,
-  CartesianGrid,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
-import {
-  ANALYTICS_STORAGE_KEY,
-  clearEvents,
-  getSummary,
+  fetchSummary,
   type AnalyticsSummary,
 } from "../lib/analytics";
-import { clearAuthCookie, isLoggedIn } from "../lib/auth";
+import TrafficChart from "./TrafficChart";
 
 const REFRESH_MS = 3000;
 
@@ -29,162 +17,76 @@ function formatTime(iso: string): string {
   }
 }
 
-export default function AdminPage() {
-  const router = useRouter();
+export default function AdminOverviewPage() {
   const [summary, setSummary] = useState<AnalyticsSummary | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [lastUpdatedAt, setLastUpdatedAt] = useState<Date | null>(null);
 
-  function refresh() {
-    setSummary(getSummary());
-    setLastUpdatedAt(new Date());
-  }
-
   useEffect(() => {
-    if (!isLoggedIn()) {
-      router.replace("/login?next=/admin");
-      return;
-    }
+    let cancelled = false;
 
-    refresh();
-
-    const intervalId = window.setInterval(refresh, REFRESH_MS);
-
-    function onStorage(event: StorageEvent) {
-      if (event.key === ANALYTICS_STORAGE_KEY || event.key === null) {
-        refresh();
+    async function refresh() {
+      try {
+        const data = await fetchSummary();
+        if (cancelled) return;
+        setSummary(data);
+        setError(null);
+        setLastUpdatedAt(new Date());
+      } catch {
+        if (!cancelled) {
+          setError("Kunne ikke hente analytics. Er du logget ind?");
+        }
       }
     }
 
-    window.addEventListener("storage", onStorage);
+    void refresh();
+    const intervalId = window.setInterval(() => {
+      void refresh();
+    }, REFRESH_MS);
 
     return () => {
+      cancelled = true;
       window.clearInterval(intervalId);
-      window.removeEventListener("storage", onStorage);
     };
-  }, [router]);
+  }, []);
 
-  function handleLogout() {
-    clearAuthCookie();
-    router.replace("/login");
-    router.refresh();
-  }
-
-  function handleClear() {
-    if (!window.confirm("Slet alle lokale analytics-events?")) return;
-    clearEvents();
-    refresh();
+  if (error) {
+    return <p className="text-sm text-red-700">{error}</p>;
   }
 
   if (!summary) {
-    return (
-      <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col px-4 py-10 sm:px-6">
-        <p className="text-zinc-600">Indlæser…</p>
-      </main>
-    );
+    return <p className="text-zinc-600">Indlæser…</p>;
   }
 
   return (
-    <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-8 px-4 py-10 sm:px-6">
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-semibold tracking-tight text-zinc-900">
-            Analytics
-          </h1>
-          <p className="mt-2 text-zinc-600">
-            Opdateres automatisk ca. hvert 3. sekund.
-          </p>
-          {lastUpdatedAt ? (
-            <p className="mt-1 text-sm text-zinc-500">
-              Sidst opdateret: {lastUpdatedAt.toLocaleString("da-DK")}
-            </p>
-          ) : null}
+    <div className="flex flex-col gap-8">
+      {!summary.configured ? (
+        <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+          PostgreSQL er ikke konfigureret endnu. Sæt{" "}
+          <code className="font-mono">DATABASE_URL</code> i{" "}
+          <code className="font-mono">.env.local</code> og i Vercel Environment
+          Variables (se <code className="font-mono">.env.example</code>).
         </div>
-        <div className="flex gap-2">
-          <button
-            type="button"
-            onClick={handleClear}
-            className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm font-medium text-zinc-800 hover:bg-zinc-50"
-          >
-            Ryd data
-          </button>
-          <button
-            type="button"
-            onClick={handleLogout}
-            className="rounded-md bg-zinc-900 px-3 py-2 text-sm font-medium text-white hover:bg-zinc-700"
-          >
-            Log ud
-          </button>
-        </div>
-      </div>
+      ) : null}
+
+      <p className="text-sm text-zinc-500">
+        Opdateres automatisk ca. hvert 3. sekund
+        {lastUpdatedAt
+          ? ` · Sidst opdateret: ${lastUpdatedAt.toLocaleString("da-DK")}`
+          : null}
+      </p>
 
       <section className="rounded-lg border border-zinc-200 bg-white p-4">
-        <h2 className="text-lg font-semibold text-zinc-900">
-          Trafik pr. dag
-        </h2>
+        <h2 className="text-lg font-semibold text-zinc-900">Trafik pr. dag</h2>
         <p className="mt-1 text-sm text-zinc-500">
           Sidevisninger de seneste 14 dage
         </p>
-        <div className="mt-4 h-64 w-full">
-          <ResponsiveContainer width="100%" height="100%">
-            <AreaChart
-              data={summary.trafficPerDay}
-              margin={{ top: 8, right: 8, left: 0, bottom: 0 }}
-            >
-              <defs>
-                <linearGradient id="trafficFill" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#18181b" stopOpacity={0.25} />
-                  <stop offset="100%" stopColor="#18181b" stopOpacity={0} />
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#e4e4e7" />
-              <XAxis
-                dataKey="label"
-                tick={{ fill: "#71717a", fontSize: 12 }}
-                tickLine={false}
-                axisLine={{ stroke: "#e4e4e7" }}
-              />
-              <YAxis
-                allowDecimals={false}
-                width={32}
-                tick={{ fill: "#71717a", fontSize: 12 }}
-                tickLine={false}
-                axisLine={false}
-              />
-              <Tooltip
-                contentStyle={{
-                  borderRadius: 8,
-                  borderColor: "#e4e4e7",
-                  fontSize: 13,
-                }}
-                labelFormatter={(_, payload) =>
-                  payload?.[0]?.payload?.date
-                    ? new Date(
-                        payload[0].payload.date + "T12:00:00",
-                      ).toLocaleDateString("da-DK", {
-                        weekday: "short",
-                        day: "numeric",
-                        month: "long",
-                      })
-                    : ""
-                }
-                formatter={(value) => [
-                  typeof value === "number" ? value : Number(value) || 0,
-                  "Sidevisninger",
-                ]}
-              />
-              <Area
-                type="monotone"
-                dataKey="views"
-                stroke="#18181b"
-                strokeWidth={2}
-                fill="url(#trafficFill)"
-              />
-            </AreaChart>
-          </ResponsiveContainer>
+        <div className="mt-4">
+          <TrafficChart data={summary.trafficPerDay} />
         </div>
       </section>
 
-      <section className="grid gap-4 sm:grid-cols-2">
+      <section className="grid gap-4 sm:grid-cols-3">
         <div className="rounded-lg border border-zinc-200 bg-white p-4">
           <p className="text-sm text-zinc-500">Sidevisninger</p>
           <p className="mt-1 text-3xl font-semibold tabular-nums text-zinc-950">
@@ -197,15 +99,19 @@ export default function AdminPage() {
             {summary.totalEvents}
           </p>
         </div>
+        <div className="rounded-lg border border-zinc-200 bg-white p-4">
+          <p className="text-sm text-zinc-500">Unikke brugere</p>
+          <p className="mt-1 text-3xl font-semibold tabular-nums text-zinc-950">
+            {summary.uniqueUsers}
+          </p>
+        </div>
       </section>
 
       <section className="grid gap-6 lg:grid-cols-2">
         <div className="rounded-lg border border-zinc-200 bg-white p-4">
           <h2 className="text-lg font-semibold text-zinc-900">Top sider</h2>
           {summary.topPages.length === 0 ? (
-            <p className="mt-3 text-sm text-zinc-500">
-              Ingen data endnu. Browse sitet og opdater.
-            </p>
+            <p className="mt-3 text-sm text-zinc-500">Ingen data endnu.</p>
           ) : (
             <ul className="mt-3 divide-y divide-zinc-100">
               {summary.topPages.map(({ path, count }) => (
@@ -259,7 +165,7 @@ export default function AdminPage() {
                 </div>
                 <p className="mt-0.5 font-mono text-xs text-zinc-600">
                   {event.path}
-                  {event.props
+                  {event.props && Object.keys(event.props).length > 0
                     ? ` · ${Object.entries(event.props)
                         .map(([k, v]) => `${k}=${v}`)
                         .join(", ")}`
@@ -270,6 +176,6 @@ export default function AdminPage() {
           </ul>
         )}
       </section>
-    </main>
+    </div>
   );
 }

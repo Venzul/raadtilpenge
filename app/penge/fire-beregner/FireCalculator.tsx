@@ -11,6 +11,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { useCalculatorAnalytics } from "../../lib/useCalculatorAnalytics";
 import {
   calculateFire,
   formatDkk,
@@ -248,6 +249,27 @@ export default function FireCalculator() {
     expectedReturnPercent: expectedReturn,
     inflationPercent: inflation,
     currentAge,
+  });
+
+  useCalculatorAnalytics({
+    section: "penge",
+    tabKey: "fire-beregner",
+    calculator: "fire-beregner",
+    inputs: {
+      annualIncome,
+      annualExpenses,
+      currentSavings,
+      currentAge,
+      expectedReturn,
+      inflation,
+    },
+    outputs: {
+      fireGoal: result.fireGoal,
+      yearsToFire: result.yearsToFire,
+      fireAge: result.fireAge,
+      annualSavings: result.annualSavings,
+      savingsRatePercent: result.savingsRatePercent,
+    },
   });
 
   return (

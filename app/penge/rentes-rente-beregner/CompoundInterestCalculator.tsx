@@ -11,6 +11,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { useCalculatorAnalytics } from "../../lib/useCalculatorAnalytics";
 import {
   formatDkk,
   formatNumberDa,
@@ -306,6 +307,23 @@ export default function CompoundInterestCalculator() {
 
   const tableRows =
     tableMode === "years" ? projection.yearlyRows : projection.monthlyRows;
+
+  useCalculatorAnalytics({
+    section: "penge",
+    tabKey: "rentes-rente-beregner",
+    calculator: "rentes-rente-beregner",
+    inputs: {
+      startAmount,
+      monthlyDeposit,
+      annualReturn,
+      years,
+    },
+    outputs: {
+      finalBalance: projection.finalBalance,
+      totalDeposited: projection.totalDeposited,
+      totalReturn: projection.totalReturn,
+    },
+  });
 
   return (
     <div className="flex flex-col gap-10 text-white">
