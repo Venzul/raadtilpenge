@@ -152,17 +152,6 @@ const almAktiedepotEtfs: EtfRow[] = [
 
 const askEtfs: EtfRow[] = [
   {
-    isin: "SPYL",
-    navn: "SPDR S&P 500 UCITS ETF",
-    aop: "0,03 %",
-    indeks: "S&P 500",
-    antalAktier: "~500",
-    pris: "82",
-    beskatningsform: "Aktie",
-    skatPositiv: "Akkum",
-    kommentar: "Ja",
-  },
-  {
     isin: "PRAW",
     navn: "Amundi Prime Global UCITS ETF",
     aop: "0,05 %",
@@ -217,6 +206,21 @@ const askEtfs: EtfRow[] = [
     skatPositiv: "Akkum",
     kommentar: "Ja",
   },
+];
+
+const pensionEtfs: EtfRow[] = [
+  {
+    isin: "SPYL",
+    navn: "SPDR S&P 500 UCITS ETF",
+    aop: "0,03 %",
+    indeks: "S&P 500",
+    antalAktier: "~500",
+    pris: "82",
+    beskatningsform: "Aktie",
+    skatPositiv: "Akkum",
+    kommentar: "Ja",
+  },
+  ...askEtfs,
 ];
 
 function OptionButton({
@@ -634,7 +638,7 @@ export default function AktieKontotyper() {
           <AccountResult
             title={selectedPensionType.label}
             description={pensionTypeInfo[pensionType]}
-            etfs={askEtfs}
+            etfs={pensionEtfs}
           />
         </>
       )}
