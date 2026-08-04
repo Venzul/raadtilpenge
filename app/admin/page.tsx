@@ -187,13 +187,13 @@ export default function AdminPage() {
       <section className="grid gap-4 sm:grid-cols-2">
         <div className="rounded-lg border border-zinc-200 bg-white p-4">
           <p className="text-sm text-zinc-500">Sidevisninger</p>
-          <p className="mt-1 text-3xl font-semibold tabular-nums">
+          <p className="mt-1 text-3xl font-semibold tabular-nums text-zinc-950">
             {summary.pageViews}
           </p>
         </div>
         <div className="rounded-lg border border-zinc-200 bg-white p-4">
           <p className="text-sm text-zinc-500">Events i alt</p>
-          <p className="mt-1 text-3xl font-semibold tabular-nums">
+          <p className="mt-1 text-3xl font-semibold tabular-nums text-zinc-950">
             {summary.totalEvents}
           </p>
         </div>
