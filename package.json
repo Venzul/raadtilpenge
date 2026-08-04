@@ -6,14 +6,18 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "import:positivliste": "node scripts/import-skats-positivliste.mjs",
+    "import:positivliste:download": "node scripts/import-skats-positivliste.mjs --download",
+    "import:positivliste:db": "node scripts/import-skats-positivliste.mjs --db"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.1.0",
     "next": "16.2.12",
     "react": "19.2.4",
     "react-dom": "19.2.4",
-    "recharts": "^3.10.1"
+    "recharts": "^3.10.1",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

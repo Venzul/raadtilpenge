@@ -62,6 +62,32 @@ export async function ensureSchema(): Promise<void> {
         CREATE INDEX IF NOT EXISTS calculator_runs_tab_created_idx
         ON calculator_runs (section, tab_key, created_at DESC)
       `;
+      await db`
+        CREATE TABLE IF NOT EXISTS skats_positivliste (
+          id BIGSERIAL PRIMARY KEY,
+          isin TEXT NOT NULL,
+          name_shareclass TEXT,
+          name_subfund TEXT,
+          name TEXT,
+          tax_residence TEXT,
+          registered_years TEXT,
+          sheet_year INT NOT NULL DEFAULT 2026,
+          source TEXT,
+          imported_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        )
+      `;
+      await db`
+        CREATE INDEX IF NOT EXISTS skats_positivliste_isin_year_idx
+        ON skats_positivliste (isin, sheet_year)
+      `;
+      await db`
+        CREATE INDEX IF NOT EXISTS skats_positivliste_name_shareclass_idx
+        ON skats_positivliste (name_shareclass)
+      `;
+      await db`
+        CREATE INDEX IF NOT EXISTS skats_positivliste_sheet_year_idx
+        ON skats_positivliste (sheet_year)
+      `;
     })().catch((error) => {
       schemaReady = null;
       throw error;

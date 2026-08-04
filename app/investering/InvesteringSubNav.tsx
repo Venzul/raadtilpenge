@@ -16,6 +16,11 @@ const subtabs = [
     label: "Indeks oversigt",
     exact: false,
   },
+  {
+    href: "/investering/skats-positivliste",
+    label: "Skats positivliste",
+    exact: false,
+  },
 ] as const;
 
 export default function InvesteringSubNav() {

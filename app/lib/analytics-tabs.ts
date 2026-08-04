@@ -63,6 +63,13 @@ export const ANALYTICS_TABS: AnalyticsTab[] = [
     path: "/investering/index-overview",
     hasInputs: false,
   },
+  {
+    section: "investering",
+    tabKey: "skats-positivliste",
+    label: "Investering · Skats positivliste",
+    path: "/investering/skats-positivliste",
+    hasInputs: true,
+  },
 ];
 
 export function resolveTabFromPath(pathname: string): {

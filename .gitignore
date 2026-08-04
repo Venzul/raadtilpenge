@@ -33,6 +33,9 @@ yarn-error.log*
 # env files (can opt-in for committing if needed)
 .env*
 
+# local Skat Excel downloads (JSON under data/ is committed)
+juni-*-abis-liste-*.xlsx
+
 # vercel
 .vercel
 
