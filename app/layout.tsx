@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import AnalyticsTracker from "./components/AnalyticsTracker";
 import SiteHeader from "./components/SiteHeader";
 import "./globals.css";
 
@@ -30,6 +31,7 @@ export default function RootLayout({
     >
       <body className="flex min-h-full flex-col bg-zinc-50 font-sans text-zinc-900">
         <SiteHeader />
+        <AnalyticsTracker />
         {children}
       </body>
     </html>

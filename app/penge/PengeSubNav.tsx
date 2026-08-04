@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { track } from "../lib/analytics";
 
 const subtabs = [
   { href: "/penge", label: "Oversigt", exact: true },
@@ -41,6 +42,9 @@ export default function PengeSubNav() {
           <Link
             key={href}
             href={href}
+            onClick={() =>
+              track("tab_click", { section: "penge", tab: label, href })
+            }
             className={`shrink-0 border-b-2 px-3 py-2.5 text-sm font-medium transition-colors ${
               isActive
                 ? "border-white text-white"
