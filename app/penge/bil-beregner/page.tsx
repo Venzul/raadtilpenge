@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import CarCalculator from "./CarCalculator";
 
 export const metadata: Metadata = {
-  title: "Bil beregner | RådTilPenge",
+  title: "Bil beregner | Råd Til Penge",
   description:
     "Find ud af, hvad du realistisk kan købe bil for ud fra nettoindkomst, TCO og lån – baglæns fra budget til max bilpris.",
 };

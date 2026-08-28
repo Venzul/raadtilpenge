@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import AktieKontotyper from "./AktieKontotyper";
 
 export const metadata: Metadata = {
-  title: "Aktie kontotyper | RådTilPenge",
+  title: "Aktie kontotyper | Råd Til Penge",
   description:
     "Find den rigtige aktie-kontotype trin for trin – til børn, frie midler, pension og erhverv.",
 };

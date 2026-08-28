@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { clearAuthCookie, isLoggedIn } from "../lib/auth";
+import { SITE_NAME } from "../lib/brand";
 
 const navLinks = [
   { href: "/investering", label: "Investering" },
@@ -37,7 +38,7 @@ export default function SiteHeader() {
           href="/"
           className="text-lg font-semibold tracking-tight text-zinc-900"
         >
-          RådTilPenge
+          {SITE_NAME}
         </Link>
 
         <nav className="flex items-center gap-1 sm:gap-2">

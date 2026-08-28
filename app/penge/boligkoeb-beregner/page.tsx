@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import MortgageCalculator from "./MortgageCalculator";
 
 export const metadata: Metadata = {
-  title: "Boligkøb beregner | RådTilPenge",
+  title: "Boligkøb beregner | Råd Til Penge",
   description:
     "Se, hvad det koster at låne til ny bolig – ydelse, lånedetaljer og amortisationstabel.",
 };
