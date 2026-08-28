@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import FireCalculator from "./FireCalculator";
 
 export const metadata: Metadata = {
-  title: "FIRE Beregner | RådTilPenge",
+  title: "FIRE Beregner | Råd Til Penge",
   description:
     "Beregn dit FIRE-mål efter 4%-reglen, opsparingsrate og estimeret tid til økonomisk uafhængighed.",
 };

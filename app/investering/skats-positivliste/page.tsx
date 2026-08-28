@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import SkatsPositivliste from "./SkatsPositivliste";
 
 export const metadata: Metadata = {
-  title: "Skats positivliste | RådTilPenge",
+  title: "Skats positivliste | Råd Til Penge",
   description:
     "Forstå Skats positivliste (ABIS), søg på ISIN eller fondsnavn, og se om vores anbefalede ETF'er er på listen.",
 };

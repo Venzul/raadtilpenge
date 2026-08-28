@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import CompoundInterestCalculator from "./CompoundInterestCalculator";
 
 export const metadata: Metadata = {
-  title: "Rentes rente beregner | RådTilPenge",
+  title: "Rentes rente beregner | Råd Til Penge",
   description:
     "Beregn hvordan opsparing vokser med rentes rente – inklusive månedlige indbetalinger og årligt afkast.",
 };

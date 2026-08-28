@@ -1,10 +1,11 @@
 import Link from "next/link";
+import { SITE_NAME } from "./lib/brand";
 
 export default function Home() {
   return (
     <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-10 sm:px-6">
       <h1 className="text-3xl font-semibold tracking-tight text-zinc-900 sm:text-4xl">
-        RådTilPenge
+        {SITE_NAME}
       </h1>
       <p className="mt-4 max-w-2xl text-lg leading-8 text-zinc-600">
         Velkommen. Her får du råd om investering og privatøkonomi – på dansk.

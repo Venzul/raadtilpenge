@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import IndexOverview from "./IndexOverview";
 
 export const metadata: Metadata = {
-  title: "Indeks oversigt | RådTilPenge",
+  title: "Indeks oversigt | Råd Til Penge",
   description:
     "Forstå aktiemarkedets indekser på dansk — ACWI IMI, MSCI World, S&P 500, Nasdaq, geografisk fordeling og hvad dine fonde egentlig dækker.",
 };
